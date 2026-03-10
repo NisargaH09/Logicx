@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hospital Smart Connect — Save Lives Faster{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;">
+      <div class="hero-content fade-in">
+        <div class="hero-badge">
+          <span>🔴</span> Live Emergency Platform
+        </div>
+        <h1>Smart Healthcare,<br><span class="text-gradient">Connected Lives</span></h1>
+        <p class="hero-tagline">Real-time ambulance tracking, live bed &amp; ICU availability, emergency booking, digital records, and AI-powered routing — all in one unified platform.</p>
+        <div class="hero-actions">
+          <a href="{% url 'ambulance' %}" class="btn btn-emergency btn-lg" id="hero-ambulance">🚑 Request Ambulance</a>
+          <a href="{% url 'hospitals' %}" class="btn btn-outline btn-lg" id="hero-hospitals">🏥 Find Hospital</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">{{ stats.hospitals }}+</div>
+            <div class="hero-stat-label">Hospitals Connected</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">{{ stats.ambulances }}</div>
+            <div class="hero-stat-label">Ambulances Available</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">{{ stats.doctors }}+</div>
+            <div class="hero-stat-label">Doctors On Duty</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual -->
+      <div style="position:relative;display:flex;justify-content:center;" class="fade-in">
+        <div style="width:360px;height:420px;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(124,58,237,0.08));border-radius:24px;border:1px solid rgba(255,255,255,0.1);padding:1.5rem;backdrop-filter:blur(10px);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(rgba(0,212,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.05) 1px,transparent 1px);background-size:30px 30px;"></div>
+
+          <!-- Live status cards -->
+          <div style="position:relative;z-index:2;display:flex;flex-direction:column;gap:.75rem;">
+            <div style="background:rgba(46,213,115,0.12);border:1px solid rgba(46,213,115,0.25);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:.75rem;">
+              <span style="font-size:1.5rem">🚑</span>
+              <div><div style="font-weight:700;font-size:.9rem">Ambulance Dispatched</div><div style="font-size:.78rem;color:#8892b0">ETA: 4 minutes · MH-12-AB-3421</div></div>
+              <span class="badge badge-green" style="margin-left:auto">Live</span>
+            </div>
+            <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:.75rem;">
+              <span style="font-size:1.5rem">🏥</span>
+              <div><div style="font-weight:700;font-size:.9rem">Ruby Hall Clinic</div><div style="font-size:.78rem;color:#8892b0">12 beds · 3 ICU · 5 Doctors</div></div>
+              <span class="badge badge-green" style="margin-left:auto">Available</span>
+            </div>
+            <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:.75rem;">
+              <span style="font-size:1.5rem">📋</span>
+              <div><div style="font-weight:700;font-size:.9rem">Appointment Confirmed</div><div style="font-size:.78rem;color:#8892b0">Dr. Sharma · Today 3:30 PM</div></div>
+              <span class="badge badge-purple" style="margin-left:auto">Booked</span>
+            </div>
+
+            <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:12px;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem;">
+              <span style="font-size:1.2rem">📲</span>
+              <div style="font-size:.82rem;color:#8892b0">Relative notified at <span style="color:#fff;font-weight:600">+91 98xxx xxxxx</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE HIGHLIGHTS -->
+<section class="section-sm" style="background:rgba(0,0,0,0.25);border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.25rem;">
+      {% for feature in features %}
+      <div style="text-align:center;padding:1.25rem .75rem;">
+        <div style="font-size:2rem;margin-bottom:.5rem">{{ feature.icon }}</div>
+        <div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">{{ feature.title }}</div>
+        <div style="font-size:.78rem;color:#8892b0">{{ feature.desc }}</div>
+      </div>
+      {% empty %}
+      {% for f in "12345678" %}
+      {% endfor %}
+      <div style="text-align:center;padding:1.25rem .75rem;"><div style="font-size:2rem;margin-bottom:.5rem">🚑</div><div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">Live Tracking</div><div style="font-size:.78rem;color:#8892b0">Real-time ambulance GPS</div></div>
+      <div style="text-align:center;padding:1.25rem .75rem;"><div style="font-size:2rem;margin-bottom:.5rem">🛏️</div><div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">Bed Availability</div><div style="font-size:.78rem;color:#8892b0">Live bed & ICU counts</div></div>
+      <div style="text-align:center;padding:1.25rem .75rem;"><div style="font-size:2rem;margin-bottom:.5rem">📅</div><div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">Emergency Booking</div><div style="font-size:.78rem;color:#8892b0">Instant appointment slots</div></div>
+      <div style="text-align:center;padding:1.25rem .75rem;"><div style="font-size:2rem;margin-bottom:.5rem">🗂️</div><div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">Digital Records</div><div style="font-size:.78rem;color:#8892b0">Medical history anywhere</div></div>
+
+      <div style="text-align:center;padding:1.25rem .75rem;"><div style="font-size:2rem;margin-bottom:.5rem">🤖</div><div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">AI Route Optimizer</div><div style="font-size:.78rem;color:#8892b0">Fastest ambulance routes</div></div>
+      <div style="text-align:center;padding:1.25rem .75rem;"><div style="font-size:2rem;margin-bottom:.5rem">📲</div><div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">Relative Updates</div><div style="font-size:.78rem;color:#8892b0">Instant family alerts</div></div>
+      <div style="text-align:center;padding:1.25rem .75rem;"><div style="font-size:2rem;margin-bottom:.5rem">🏛️</div><div style="font-size:.88rem;font-weight:600;margin-bottom:.25rem">Govt Helplines</div><div style="font-size:.78rem;color:#8892b0">108, 112, PMJAY & more</div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- HOSPITALS -->
+<section class="section">
+  <div class="container">
+    <div class="section-header flex-between" style="display:flex;align-items:flex-end;justify-content:space-between;">
+      <div>
+        <span class="section-label">Live Availability</span>
+        <h2 class="section-title">Connected Hospitals</h2>
+        <p class="section-sub">Real-time bed, ICU and doctor availability updated every minute.</p>
+      </div>
+      <a href="{% url 'hospitals' %}" class="btn btn-outline" id="hospitals-all">View All →</a>
+    </div>
+    <div class="grid grid-auto">
+      {% for hospital in hospitals %}
+      <div class="card hospital-card fade-in">
+        <div class="hospital-card-header">
+          <div>
+            <div class="hospital-name">{{ hospital.name }}</div>
+            <div class="hospital-address">📍 {{ hospital.address }}</div>
+          </div>
+          {% if hospital.availability_status == 'high' %}
+            <span class="badge badge-green"><span class="dot dot-green"></span>Available</span>
+          {% elif hospital.availability_status == 'low' %}
+            <span class="badge badge-orange"><span class="dot dot-orange"></span>Limited</span>
+          {% else %}
+            <span class="badge badge-red"><span class="dot dot-red"></span>Full</span>
+          {% endif %}
+        </div>
+
+        {% if hospital.resource %}
+        <div class="resource-grid">
+          <div class="resource-item">
+            <div class="resource-num {% if hospital.resource.available_beds > 5 %}green{% elif hospital.resource.available_beds > 0 %}orange{% else %}red{% endif %}">{{ hospital.resource.available_beds }}</div>
+            <div class="resource-label">Beds</div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-num {% if hospital.resource.available_icu > 2 %}green{% elif hospital.resource.available_icu > 0 %}orange{% else %}red{% endif %}">{{ hospital.resource.available_icu }}</div>
+            <div class="resource-label">ICU</div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-num blue">{{ hospital.resource.available_doctors }}</div>
+            <div class="resource-label">Doctors</div>
+          </div>
+        </div>
+
+        <!-- Bed occupancy bar -->
+        <div style="font-size:.75rem;color:#8892b0;margin-bottom:.25rem">Bed Occupancy: {{ hospital.resource.bed_occupancy_pct }}%</div>
+        <div class="progress-bar">
+          <div class="progress-fill {% if hospital.resource.bed_occupancy_pct < 60 %}green{% elif hospital.resource.bed_occupancy_pct < 85 %}orange{% else %}red{% endif %}" style="width:{{ hospital.resource.bed_occupancy_pct }}%"></div>
+        </div>
+        {% endif %}
+
+        <div style="display:flex;gap:.75rem;margin-top:1.25rem">
+          <a href="{% url 'hospital_detail' hospital.pk %}" class="btn btn-outline btn-sm" id="view-hospital-{{ hospital.pk }}">View Details</a>
+          <a href="{% url 'book_appointment' %}?hospital={{ hospital.pk }}" class="btn btn-primary btn-sm" id="book-hospital-{{ hospital.pk }}">Book Now</a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="card" style="grid-column:1/-1;text-align:center;color:#8892b0;">No hospitals found. <a href="/admin/" style="color:var(--clr-primary)">Add data via Admin →</a></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- GOVERNMENT HELPLINES -->
+<section class="section" style="background:rgba(255,71,87,0.04);border-top:1px solid rgba(255,71,87,0.1);border-bottom:1px solid rgba(255,71,87,0.1)">
+  <div class="container">
+    <div class="section-header" style="text-align:center;margin-bottom:2.5rem">
+      <span class="section-label" style="color:var(--clr-accent-red)">🏛️ Government Integration</span>
+      <h2 class="section-title">Emergency Helplines</h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">Integrated national helplines for instant emergency response across India.</p>
+    </div>
+    <div class="grid grid-4">
+      {% for helpline in helplines %}
+      <a href="tel:{{ helpline.number }}" class="helpline-card" id="helpline-{{ helpline.pk }}">
+        <div class="helpline-icon" style="background:rgba(255,71,87,0.12)">{{ helpline.icon }}</div>
+        <div>
+          <div class="helpline-num">{{ helpline.number }}</div>
+          <div class="helpline-name">{{ helpline.name }}</div>
+        </div>
+      </a>
+      {% empty %}
+      <!-- Default helplines -->
+      <a href="tel:108" class="helpline-card" id="helpline-108"><div class="helpline-icon" style="background:rgba(255,71,87,0.12)">🚑</div><div><div class="helpline-num">108</div><div class="helpline-name">Ambulance Emergency</div></div></a>
+      <a href="tel:112" class="helpline-card" id="helpline-112"><div class="helpline-icon" style="background:rgba(255,71,87,0.12)">🆘</div><div><div class="helpline-num">112</div><div class="helpline-name">National Emergency</div></div></a>
+      <a href="tel:100" class="helpline-card" id="helpline-100"><div class="helpline-icon" style="background:rgba(0,0,255,0.12)">👮</div><div><div class="helpline-num">100</div><div class="helpline-name">Police</div></div></a>
+      <a href="tel:101" class="helpline-card" id="helpline-101"><div class="helpline-icon" style="background:rgba(255,165,2,0.12)">🔥</div><div><div class="helpline-num">101</div><div class="helpline-name">Fire Brigade</div></div></a>
+      <a href="tel:104" class="helpline-card" id="helpline-104"><div class="helpline-icon" style="background:rgba(46,213,115,0.12)">🏥</div><div><div class="helpline-num">104</div><div class="helpline-name">Medical Helpline</div></div></a>
+      <a href="tel:1075" class="helpline-card" id="helpline-1075"><div class="helpline-icon" style="background:rgba(124,58,237,0.12)">🛡️</div><div><div class="helpline-num">1075</div><div class="helpline-name">COVID-19 Helpline</div></div></a>
+      <a href="tel:14567" class="helpline-card" id="helpline-14567"><div class="helpline-icon" style="background:rgba(0,212,255,0.12)">👴</div><div><div class="helpline-num">14567</div><div class="helpline-name">Senior Citizen</div></div></a>
+      <a href="tel:1800111565" class="helpline-card" id="helpline-pmjay"><div class="helpline-icon" style="background:rgba(255,71,87,0.12)">🏛️</div><div><div class="helpline-num">1800-111-565</div><div class="helpline-name">Ayushman Bharat</div></div></a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section">
+  <div class="container">
+    <div class="card" style="text-align:center;padding:4rem 2rem;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(124,58,237,0.08));border-color:rgba(0,212,255,0.2)">
+      <span style="font-size:3rem;display:block;margin-bottom:1rem">🏥</span>
+      <h2>Ready to Modernize Emergency Healthcare?</h2>
+      <p style="max-width:480px;margin:1rem auto 2rem">Register now for digital medical records, instant bookings, and live ambulance tracking at your fingertips.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg" id="cta-dashboard">Go to Dashboard</a>
+        {% else %}
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg" id="cta-register">Create Free Account</a>
+        <a href="{% url 'login' %}" class="btn btn-outline btn-lg" id="cta-login">Sign In</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

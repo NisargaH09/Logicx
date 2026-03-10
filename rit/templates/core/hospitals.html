@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Hospitals — Hospital Smart Connect{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <!-- Header -->
+    <div class="section-header">
+      <span class="section-label">🏥 Live Availability</span>
+      <h1 class="section-title">Find Hospitals Near You</h1>
+      <p class="section-sub">Real-time bed, ICU and doctor availability — updated every minute.</p>
+    </div>
+
+    <!-- Search / Filter -->
+    <form method="get" action="{% url 'hospitals' %}" style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap" id="hospital-search-form">
+      <input type="text" name="q" value="{{ query }}" placeholder="🔍 Search hospital name or area..." class="form-control" style="flex:1;min-width:200px" id="hospital-search-input">
+      <select name="city" class="form-control" style="width:180px" id="hospital-city-filter">
+        <option value="">All Cities</option>
+        {% for c in cities %}
+        <option value="{{ c }}" {% if c == city %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary" id="hospital-search-btn">Search</button>
+      {% if query or city %}
+      <a href="{% url 'hospitals' %}" class="btn btn-outline" id="hospital-clear-btn">Clear</a>
+      {% endif %}
+    </form>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:1.5rem;margin-bottom:2rem;flex-wrap:wrap">
+      <span class="badge badge-green"><span class="dot dot-green"></span>High Availability</span>
+      <span class="badge badge-orange"><span class="dot dot-orange"></span>Limited Beds</span>
+      <span class="badge badge-red"><span class="dot dot-red"></span>Fully Occupied</span>
+    </div>
+
+    <!-- Hospital Grid -->
+    <div class="grid grid-auto">
+      {% for hospital in hospitals %}
+      <div class="card hospital-card fade-in" style="animation-delay:{{ forloop.counter0 }}00ms" id="hospital-card-{{ hospital.pk }}">
+        <div class="hospital-card-header">
+          <div>
+            <div class="hospital-name">{{ hospital.name }}</div>
+            <div class="hospital-address" style="margin-top:.25rem">📍 {{ hospital.address }}, {{ hospital.city }}</div>
+            <div style="font-size:.8rem;color:#8892b0;margin-top:.25rem">📞 {{ hospital.phone }}</div>
+          </div>
+          {% if hospital.availability_status == 'high' %}
+            <span class="badge badge-green"><span class="dot dot-green"></span>Available</span>
+          {% elif hospital.availability_status == 'low' %}
+            <span class="badge badge-orange"><span class="dot dot-orange"></span>Limited</span>
+          {% else %}
+            <span class="badge badge-red"><span class="dot dot-red"></span>Full</span>
+          {% endif %}
+        </div>
+
+        {% if hospital.resource %}
+        <div class="resource-grid">
+          <div class="resource-item">
+            <div class="resource-num {% if hospital.resource.available_beds > 5 %}green{% elif hospital.resource.available_beds > 0 %}orange{% else %}red{% endif %}">{{ hospital.resource.available_beds }}</div>
+            <div class="resource-label">Beds Free</div>
+            <div style="font-size:.7rem;color:#4a5568">({{ hospital.resource.total_beds }} total)</div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-num {% if hospital.resource.available_icu > 2 %}green{% elif hospital.resource.available_icu > 0 %}orange{% else %}red{% endif %}">{{ hospital.resource.available_icu }}</div>
+            <div class="resource-label">ICU Free</div>
+            <div style="font-size:.7rem;color:#4a5568">({{ hospital.resource.total_icu }} total)</div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-num blue">{{ hospital.resource.available_doctors }}</div>
+            <div class="resource-label">Doctors</div>
+            <div style="font-size:.7rem;color:#4a5568">({{ hospital.resource.total_doctors }} total)</div>
+          </div>
+        </div>
+
+        <div style="margin:1rem 0">
+          <div style="font-size:.75rem;color:#8892b0;display:flex;justify-content:space-between;margin-bottom:.25rem"><span>Bed Occupancy</span><span>{{ hospital.resource.bed_occupancy_pct }}%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill {% if hospital.resource.bed_occupancy_pct < 60 %}green{% elif hospital.resource.bed_occupancy_pct < 85 %}orange{% else %}red{% endif %}" style="width:{{ hospital.resource.bed_occupancy_pct }}%"></div>
+          </div>
+          <div style="font-size:.75rem;color:#8892b0;display:flex;justify-content:space-between;margin-top:.5rem;margin-bottom:.25rem"><span>ICU Occupancy</span><span>{{ hospital.resource.icu_occupancy_pct }}%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill {% if hospital.resource.icu_occupancy_pct < 60 %}green{% elif hospital.resource.icu_occupancy_pct < 85 %}orange{% else %}red{% endif %}" style="width:{{ hospital.resource.icu_occupancy_pct }}%"></div>
+          </div>
+        </div>
+
+        {% if hospital.resource.ventilators_available %}
+        <div style="font-size:.8rem;color:#8892b0;">💨 Ventilators: <strong style="color:#e8eaf6">{{ hospital.resource.ventilators_available }}</strong> &nbsp;|&nbsp; 🔪 OTs: <strong style="color:#e8eaf6">{{ hospital.resource.operation_theaters }}</strong></div>
+        {% endif %}
+        {% endif %}
+
+        <div style="display:flex;gap:.75rem;margin-top:1.25rem">
+          <a href="{% url 'hospital_detail' hospital.pk %}" class="btn btn-outline btn-sm" id="view-btn-{{ hospital.pk }}">View Details</a>
+          <a href="{% url 'book_appointment' %}?hospital={{ hospital.pk }}" class="btn btn-primary btn-sm" id="book-btn-{{ hospital.pk }}">Book Appointment</a>
+          {% if hospital.emergency_contact %}
+          <a href="tel:{{ hospital.emergency_contact }}" class="btn btn-sm" style="background:rgba(255,71,87,0.15);color:#ff4757;border:1px solid rgba(255,71,87,0.3)" id="call-btn-{{ hospital.pk }}">📞 Call</a>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="card" style="grid-column:1/-1;text-align:center;padding:3rem;color:#8892b0">
+        <div style="font-size:3rem;margin-bottom:1rem">🔍</div>
+        <h3>No hospitals found</h3>
+        <p>Try a different search term or city, or <a href="/admin/" style="color:var(--clr-primary)">add hospital data via Admin</a>.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Payment — Hospital Smart Connect{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container" style="max-width:560px">
+    <div style="margin-bottom:1.5rem"><a href="{% url 'my_appointments' %}" style="color:#8892b0;font-size:.85rem">← Back to Appointments</a></div>
+    <div class="card" style="padding:2.5rem">
+      <div style="text-align:center;margin-bottom:2rem">
+        <div style="font-size:2.5rem;margin-bottom:.5rem">💳</div>
+        <h1 style="font-size:1.75rem">Cashless Payment</h1>
+        <p>Settle your hospital bill digitally — zero stress.</p>
+      </div>
+
+      <!-- Appointment Summary -->
+      <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem">
+        <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--clr-primary);margin-bottom:.75rem;font-weight:700">Appointment Details</div>
+        <div style="display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:.35rem"><span style="color:#8892b0">Hospital</span><strong>{{ appointment.hospital.name }}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:.35rem"><span style="color:#8892b0">Type</span><strong>{{ appointment.get_appointment_type_display }}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:.35rem"><span style="color:#8892b0">Date</span><strong>{{ appointment.scheduled_at|date:"d M Y, h:i A" }}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:.9rem"><span style="color:#8892b0">Status</span><span class="badge badge-orange">{{ appointment.get_status_display }}</span></div>
+      </div>
+
+      <form method="post" id="payment-form">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Amount (₹) *</label>
+          <input type="number" name="amount" id="payment-amount" step="0.01" min="1" value="500" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Payment Method *</label>
+          <div class="payment-methods" id="payment-methods">
+            <div class="payment-method selected" onclick="selectMethod(this,'upi')" id="method-upi">📱 UPI</div>
+            <div class="payment-method" onclick="selectMethod(this,'card')" id="method-card">💳 Card</div>
+            <div class="payment-method" onclick="selectMethod(this,'net_banking')" id="method-net">🏦 Net Banking</div>
+            <div class="payment-method" onclick="selectMethod(this,'insurance')" id="method-ins">🛡️ Insurance</div>
+            <div class="payment-method" onclick="selectMethod(this,'cash')" id="method-cash">💵 Cash</div>
+          </div>
+          <input type="hidden" name="method" id="payment-method-val" value="upi">
+        </div>
+
+        <div id="upi-section" style="margin-bottom:1.25rem">
+          <label class="form-label">UPI ID</label>
+          <input type="text" placeholder="yourname@upi" class="form-control" id="upi-id-input">
+          <div class="form-hint">Supports GPay, PhonePe, Paytm, BHIM etc.</div>
+        </div>
+
+        <div style="background:rgba(46,213,115,0.06);border:1px solid rgba(46,213,115,0.2);border-radius:10px;padding:1rem;margin-bottom:1.5rem;font-size:.85rem;display:flex;gap:.75rem;align-items:center">
+          <span>🔒</span>
+          <div>All transactions are secured with end-to-end encryption. This platform supports Ayushman Bharat (PMJAY) insurance settlement.</div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg btn-block" id="pay-now-btn">💳 Pay Now →</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function selectMethod(el, val) {
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('payment-method-val').value = val;
+  document.getElementById('upi-section').style.display = val === 'upi' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

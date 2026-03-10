@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Medical Records — Hospital Smart Connect{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+          <div class="sidebar-name">{{ user.get_full_name|default:user.username }}</div>
+          <div class="sidebar-username">@{{ user.username }}</div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="{% url 'dashboard' %}" class="sidebar-link" id="sidebar-dashboard"><span class="sidebar-icon">🏠</span>Dashboard</a>
+          <a href="{% url 'my_appointments' %}" class="sidebar-link" id="sidebar-appointments"><span class="sidebar-icon">📅</span>Appointments</a>
+          <a href="{% url 'medical_records' %}" class="sidebar-link active" id="sidebar-records"><span class="sidebar-icon">🗂️</span>Medical Records</a>
+          <a href="{% url 'profile' %}" class="sidebar-link" id="sidebar-profile"><span class="sidebar-icon">👤</span>My Profile</a>
+          <a href="{% url 'hospitals' %}" class="sidebar-link" id="sidebar-hospitals"><span class="sidebar-icon">🏥</span>Find Hospitals</a>
+          <div style="border-top:1px solid var(--clr-border);margin:.75rem 0"></div>
+          <a href="{% url 'book_appointment' %}" class="sidebar-link" id="sidebar-book" style="color:var(--clr-primary)"><span class="sidebar-icon">✚</span>Book Appointment</a>
+        </nav>
+      </aside>
+
+      <main>
+        <h1 style="font-size:1.5rem;margin-bottom:1.5rem">🗂️ Digital Medical Records</h1>
+        <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:12px;padding:1rem;margin-bottom:1.5rem;font-size:.85rem;display:flex;gap:.75rem;align-items:center">
+          <span style="font-size:1.25rem">🔒</span>
+          <div>Your medical records are encrypted, private, and only accessible by you. Records are added by your treating doctors after each visit.</div>
+        </div>
+
+        {% if records %}
+        <div style="display:flex;flex-direction:column;gap:1.25rem">
+          {% for rec in records %}
+          <div class="card" style="padding:1.75rem" id="record-{{ rec.pk }}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
+              <div>
+                <div style="font-size:.78rem;color:var(--clr-primary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem">{{ rec.created_at|date:"d F Y, h:i A" }}</div>
+                <h3 style="font-size:1.05rem;margin-bottom:.25rem">{{ rec.hospital.name }}</h3>
+                <div style="font-size:.85rem;color:#8892b0">👨‍⚕️ Dr. {{ rec.doctor_name }}</div>
+              </div>
+              {% if rec.is_confidential %}<span class="badge badge-orange">🔒 Confidential</span>{% endif %}
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+              <div>
+                <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#4a5568;margin-bottom:.4rem;font-weight:700">📋 Diagnosis</div>
+                <p style="font-size:.88rem;line-height:1.65;color:var(--clr-text)">{{ rec.diagnosis }}</p>
+              </div>
+              {% if rec.prescription %}
+              <div>
+                <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#4a5568;margin-bottom:.4rem;font-weight:700">💊 Prescription</div>
+                <p style="font-size:.88rem;line-height:1.65;color:var(--clr-text)">{{ rec.prescription }}</p>
+              </div>
+              {% endif %}
+              {% if rec.test_reports %}
+              <div>
+                <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#4a5568;margin-bottom:.4rem;font-weight:700">🔬 Test Reports</div>
+                <p style="font-size:.88rem;line-height:1.65;color:var(--clr-text)">{{ rec.test_reports }}</p>
+              </div>
+              {% endif %}
+              {% if rec.follow_up_date %}
+              <div>
+                <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:#4a5568;margin-bottom:.4rem;font-weight:700">📅 Follow-Up</div>
+                <p style="font-size:.88rem;font-weight:700;color:var(--clr-accent-orange)">{{ rec.follow_up_date|date:"l, d F Y" }}</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="card" style="text-align:center;padding:4rem;color:#8892b0">
+          <div style="font-size:4rem;margin-bottom:1rem">🗂️</div>
+          <h3>No Medical Records Yet</h3>
+          <p>Your records will appear here after your first consultation.</p>
+          <a href="{% url 'book_appointment' %}" class="btn btn-primary" style="margin-top:1.5rem" id="book-for-record-btn">Book a Consultation</a>
+        </div>
+        {% endif %}
+      </main>
+    </div>
+  </div>
+</section>
+{% endblock %}

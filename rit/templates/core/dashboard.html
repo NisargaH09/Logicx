@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Hospital Smart Connect{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="dashboard-layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+          <div class="sidebar-name">{{ user.get_full_name|default:user.username }}</div>
+          <div class="sidebar-username">@{{ user.username }}</div>
+          {% if user.patient_profile.blood_group %}
+          <div style="margin-top:.5rem"><span class="badge badge-red">🩸 {{ user.patient_profile.blood_group }}</span></div>
+          {% endif %}
+        </div>
+        <nav class="sidebar-nav">
+          <a href="{% url 'dashboard' %}" class="sidebar-link active" id="sidebar-dashboard"><span class="sidebar-icon">🏠</span>Dashboard</a>
+          <a href="{% url 'my_appointments' %}" class="sidebar-link" id="sidebar-appointments"><span class="sidebar-icon">📅</span>Appointments</a>
+          <a href="{% url 'medical_records' %}" class="sidebar-link" id="sidebar-records"><span class="sidebar-icon">🗂️</span>Medical Records</a>
+          <a href="{% url 'profile' %}" class="sidebar-link" id="sidebar-profile"><span class="sidebar-icon">👤</span>My Profile</a>
+          <a href="{% url 'hospitals' %}" class="sidebar-link" id="sidebar-hospitals"><span class="sidebar-icon">🏥</span>Find Hospitals</a>
+          <a href="{% url 'ambulance' %}" class="sidebar-link" id="sidebar-ambulance"><span class="sidebar-icon">🚑</span>Ambulance</a>
+          <div style="border-top:1px solid var(--clr-border);margin:.75rem 0"></div>
+          <a href="{% url 'book_appointment' %}" class="sidebar-link" id="sidebar-book" style="color:var(--clr-primary)"><span class="sidebar-icon">✚</span>Book Appointment</a>
+          <a href="{% url 'logout' %}" class="sidebar-link" id="sidebar-logout" style="color:#ff4757"><span class="sidebar-icon">🚪</span>Logout</a>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main>
+        <div style="margin-bottom:1.75rem">
+          <h1 style="font-size:1.6rem">Welcome back, <span class="text-gradient">{{ user.first_name|default:user.username }}</span> 👋</h1>
+          <p style="font-size:.9rem">Here's your healthcare overview.</p>
+        </div>
+
+        <!-- Stat Widgets -->
+        <div class="stat-grid" style="margin-bottom:2rem">
+          <div class="stat-widget" style="border-color:rgba(0,212,255,0.2)">
+            <div class="stat-widget-num text-gradient">{{ upcoming }}</div>
+            <div class="stat-widget-label">Upcoming Appointments</div>
+          </div>
+          <div class="stat-widget" style="border-color:rgba(46,213,115,0.2)">
+            <div class="stat-widget-num" style="color:var(--clr-accent-green)">{{ records|length }}</div>
+            <div class="stat-widget-label">Medical Records</div>
+          </div>
+          <div class="stat-widget" style="border-color:rgba(255,71,87,0.2)">
+            <div class="stat-widget-num" style="color:var(--clr-accent-red)">🩸 {{ user.patient_profile.blood_group|default:"—" }}</div>
+            <div class="stat-widget-label">Blood Group</div>
+          </div>
+          <div class="stat-widget" style="border-color:rgba(124,58,237,0.2)">
+            <a href="{% url 'book_appointment' %}" class="btn btn-emergency btn-sm btn-block" id="quick-book-btn">🚑 Book Now</a>
+          </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div style="margin-bottom:2rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <h2 style="font-size:1.1rem">Recent Appointments</h2>
+            <a href="{% url 'my_appointments' %}" style="font-size:.82rem;color:var(--clr-primary)">View All →</a>
+          </div>
+          {% if appointments %}
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Hospital</th><th>Type</th><th>Date &amp; Time</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody>
+                {% for appt in appointments %}
+                <tr>
+                  <td><strong>{{ appt.hospital.name }}</strong></td>
+                  <td>{{ appt.get_appointment_type_display }}</td>
+                  <td>{{ appt.scheduled_at|date:"d M Y, h:i A" }}</td>
+                  <td>
+                    {% if appt.status == 'confirmed' %}<span class="badge badge-green">Confirmed</span>
+                    {% elif appt.status == 'pending' %}<span class="badge badge-orange">Pending</span>
+                    {% elif appt.status == 'completed' %}<span class="badge badge-blue">Completed</span>
+                    {% elif appt.status == 'cancelled' %}<span class="badge badge-red">Cancelled</span>
+                    {% else %}<span class="badge">{{ appt.get_status_display }}</span>{% endif %}
+                  </td>
+                  <td>
+                    {% if appt.status not in 'completed,cancelled' %}
+                    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                      {% if not appt.payment %}
+                      <a href="{% url 'payment' appt.pk %}" class="btn btn-sm btn-success" id="pay-{{ appt.pk }}">💳 Pay</a>
+                      {% endif %}
+                      <a href="{% url 'cancel_appointment' appt.pk %}" class="btn btn-sm" style="background:rgba(255,71,87,0.12);color:#ff4757;border:1px solid rgba(255,71,87,0.25)" id="cancel-{{ appt.pk }}" onclick="return confirm('Cancel this appointment?')">Cancel</a>
+                    </div>
+                    {% else %}—{% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="card" style="text-align:center;color:#8892b0;padding:2.5rem">
+            <div style="font-size:3rem;margin-bottom:.75rem">📅</div>
+            <p>No appointments yet.</p>
+            <a href="{% url 'book_appointment' %}" class="btn btn-primary" style="margin-top:1rem" id="first-book-btn">Book Your First Appointment</a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Recent Medical Records -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <h2 style="font-size:1.1rem">Recent Medical Records</h2>
+            <a href="{% url 'medical_records' %}" style="font-size:.82rem;color:var(--clr-primary)">View All →</a>
+          </div>
+          {% if records %}
+          <div class="grid grid-auto">
+            {% for rec in records %}
+            <div class="card card-sm" id="record-{{ rec.pk }}">
+              <div style="font-size:.78rem;color:var(--clr-primary);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em">{{ rec.created_at|date:"d M Y" }}</div>
+              <div style="font-weight:700;margin-bottom:.25rem">{{ rec.hospital.name }}</div>
+              <div style="font-size:.85rem;color:#8892b0;margin-bottom:.5rem">Dr. {{ rec.doctor_name }}</div>
+              <div style="font-size:.85rem;line-height:1.5;color:var(--clr-text-muted)">{{ rec.diagnosis|truncatechars:80 }}</div>
+              {% if rec.follow_up_date %}<div style="font-size:.78rem;color:var(--clr-accent-orange);margin-top:.5rem;font-weight:600">📅 Follow-up: {{ rec.follow_up_date|date:"d M Y" }}</div>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="card" style="text-align:center;color:#8892b0;padding:2rem">
+            <div style="font-size:2.5rem;margin-bottom:.5rem">🗂️</div>
+            <p>Your medical history will appear here after your first visit.</p>
+          </div>
+          {% endif %}
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+{% endblock %}

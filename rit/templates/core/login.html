@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Sign In — Hospital Smart Connect{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container" style="max-width:440px">
+    <div class="card" style="padding:2.5rem">
+      <div style="text-align:center;margin-bottom:2rem">
+        <div style="font-size:2.5rem;margin-bottom:.5rem">🔐</div>
+        <h1 style="font-size:1.75rem">Welcome Back</h1>
+        <p>Sign in to access your healthcare dashboard.</p>
+      </div>
+
+      <!-- Emergency banner -->
+      <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:10px;padding:.75rem 1rem;margin-bottom:1.5rem;text-align:center;font-size:.85rem">
+        🚨 Emergency? Call <a href="tel:108" style="color:#ff4757;font-weight:700">108</a> or <a href="tel:112" style="color:#ff4757;font-weight:700">112</a> immediately
+      </div>
+
+      <form method="post" id="login-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" style="margin-bottom:1rem">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          {{ form.username }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          {{ form.password }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="login-submit">Sign In →</button>
+      </form>
+
+      <div style="text-align:center;margin-top:1.5rem;font-size:.88rem;color:#8892b0">
+        Don't have an account? <a href="{% url 'register' %}" style="color:var(--clr-primary);font-weight:600">Register Free</a>
+      </div>
+      <div style="text-align:center;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--clr-border)">
+        <a href="{% url 'admin_login' %}" style="font-size:.82rem;color:#4a5568">🔒 Hospital Admin Login →</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hospital Smart Connect — Real-time ambulance tracking, hospital bed availability, emergency appointment booking, and digital healthcare access.">
+  <title>{% block title %}Hospital Smart Connect{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="main-navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <a href="{% url 'home' %}" class="navbar-brand" id="brand-link">
+        <div class="cross-icon">✚</div>
+        Smart<span class="text-gradient">Connect</span>
+      </a>
+
+      <ul class="navbar-nav">
+        <li><a href="{% url 'home' %}" class="nav-link {% if page == 'home' %}active{% endif %}" id="nav-home">Home</a></li>
+        <li><a href="{% url 'hospitals' %}" class="nav-link {% if page == 'hospitals' %}active{% endif %}" id="nav-hospitals">Hospitals</a></li>
+        <li><a href="{% url 'ambulance' %}" class="nav-link {% if page == 'ambulance' %}active{% endif %}" id="nav-ambulance">🚑 Ambulance</a></li>
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'dashboard' %}" class="nav-link {% if page == 'dashboard' %}active{% endif %}" id="nav-dashboard">Dashboard</a></li>
+        {% endif %}
+      </ul>
+
+      <div class="navbar-actions">
+        <a href="tel:112" class="navbar-emergency" id="nav-emergency">🚨 112</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-sm" id="nav-book">Book Appointment</a>
+          <a href="{% url 'logout' %}" class="btn btn-outline btn-sm" id="nav-logout">Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline btn-sm" id="nav-login">Login</a>
+          <a href="{% url 'register' %}" class="btn btn-primary btn-sm" id="nav-register">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="container messages-container" id="messages-container">
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}" id="alert-{{ forloop.counter }}">
+    <span>{% if message.tags == 'success' %}✅{% elif message.tags == 'error' or message.tags == 'danger' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}</span>
+    {{ message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name flex-gap" style="display:flex;gap:.6rem;align-items:center;margin-bottom:.5rem">
+          <span style="font-size:1.4rem">🏥</span>Hospital <span class="text-gradient">Smart Connect</span>
+        </div>
+        <p class="footer-desc">A unified platform for real-time healthcare access. Saving lives through intelligent connectivity, instant ambulance dispatch, and live resource management.</p>
+      </div>
+      <div>
+        <div class="footer-heading">Quick Links</div>
+        <div class="footer-links">
+          <a href="{% url 'hospitals' %}" class="footer-link">Find Hospitals</a>
+          <a href="{% url 'ambulance' %}" class="footer-link">Track Ambulance</a>
+          <a href="{% url 'book_appointment' %}" class="footer-link">Book Appointment</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Patient</div>
+        <div class="footer-links">
+          <a href="{% url 'dashboard' %}" class="footer-link">Dashboard</a>
+          <a href="{% url 'medical_records' %}" class="footer-link">Medical Records</a>
+          <a href="{% url 'profile' %}" class="footer-link">My Profile</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Emergency</div>
+        <div class="footer-links">
+          <span class="footer-link" style="color:#ff4757;font-weight:700">🚨 Ambulance: 108</span>
+          <span class="footer-link" style="color:#ff4757">🆘 Police: 100</span>
+          <span class="footer-link" style="color:#ff4757">🔥 Fire: 101</span>
+          <span class="footer-link" style="color:#ff4757">📞 National: 112</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Hospital Smart Connect. All rights reserved.</span>
+      <div class="footer-emergency">🚨 Emergency: <a href="tel:112" style="color:inherit">112</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Auto-dismiss messages
+setTimeout(() => {
+  document.querySelectorAll('.alert').forEach(el => {
+    el.style.transition = 'opacity 0.5s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 500);
+  });
+}, 4000);
+
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('main-navbar');
+  if (window.scrollY > 50) {
+    nav.style.background = 'rgba(5,11,24,0.97)';
+  } else {
+    nav.style.background = 'rgba(5,11,24,0.85)';
+  }
+});
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

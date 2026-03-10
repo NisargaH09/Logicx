@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login — Hospital Smart Connect{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container" style="max-width:460px">
+    <div class="card" style="padding:2.5rem;border:1px solid rgba(255,165,2,0.25);background:linear-gradient(135deg,rgba(255,165,2,0.04),rgba(0,0,0,0.2))">
+
+      <div style="text-align:center;margin-bottom:2rem">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#ff8c00,#ff4757);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem;box-shadow:0 8px 25px rgba(255,140,0,0.3)">🛡️</div>
+        <h1 style="font-size:1.75rem">Admin Portal</h1>
+        <p style="color:#8892b0;font-size:.9rem">Restricted access — Hospital Staff &amp; Administrators only</p>
+      </div>
+
+      <!-- Security notice -->
+      <div style="background:rgba(255,165,2,0.08);border:1px solid rgba(255,165,2,0.2);border-radius:10px;padding:.85rem 1rem;margin-bottom:1.75rem;font-size:.82rem;color:#ffa502;display:flex;gap:.75rem;align-items:flex-start">
+        <span style="font-size:1rem;flex-shrink:0">⚠️</span>
+        <div>This portal is for hospital administrators only. All logins are recorded. Unauthorized access is prohibited.</div>
+      </div>
+
+      <form method="post" id="admin-login-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" style="margin-bottom:1rem">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+        {% if error %}
+        <div class="alert alert-danger" style="margin-bottom:1rem">{{ error }}</div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label">Admin Username</label>
+          {{ form.username }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          {{ form.password }}
+        </div>
+
+        <button type="submit" class="btn btn-lg btn-block" id="admin-login-submit"
+          style="background:linear-gradient(135deg,#ff8c00,#ff4757);color:#fff;border:none;font-weight:700;box-shadow:0 4px 20px rgba(255,140,0,0.3)">
+          🔐 Access Admin Dashboard →
+        </button>
+      </form>
+
+      <div style="text-align:center;margin-top:1.5rem;font-size:.82rem;color:#4a5568">
+        <a href="{% url 'login' %}" style="color:#8892b0">← Back to Patient Login</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

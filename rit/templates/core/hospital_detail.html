@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block title %}{{ hospital.name }} — Hospital Smart Connect{% endblock %}
+
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div style="margin-bottom:1.5rem"><a href="{% url 'hospitals' %}" style="color:#8892b0;font-size:.85rem">← Back to Hospitals</a></div>
+
+    <!-- Hospital Header -->
+    <div class="card" style="padding:2.5rem;margin-bottom:2rem;background:linear-gradient(135deg,rgba(0,212,255,0.05),rgba(124,58,237,0.05))">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:start">
+        <div>
+          <div style="font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--clr-primary);margin-bottom:.5rem">🏥 Hospital Profile</div>
+          <h1 style="font-size:2rem;margin-bottom:.5rem">{{ hospital.name }}</h1>
+          <p style="color:#8892b0;margin-bottom:1rem">📍 {{ hospital.address }}, {{ hospital.city }}</p>
+          <div style="display:flex;gap:1.5rem;flex-wrap:wrap">
+            <a href="tel:{{ hospital.phone }}" style="color:var(--clr-accent-green);font-weight:600">📞 {{ hospital.phone }}</a>
+            {% if hospital.email %}<a href="mailto:{{ hospital.email }}" style="color:#8892b0">✉️ {{ hospital.email }}</a>{% endif %}
+            {% if hospital.emergency_contact %}<a href="tel:{{ hospital.emergency_contact }}" style="color:var(--clr-accent-red);font-weight:700">🚨 Emergency: {{ hospital.emergency_contact }}</a>{% endif %}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.75rem;align-items:flex-end">
+          {% if hospital.availability_status == 'high' %}
+            <span class="badge badge-green" style="font-size:.9rem;padding:.5rem 1.2rem"><span class="dot dot-green"></span>High Availability</span>
+          {% elif hospital.availability_status == 'low' %}
+            <span class="badge badge-orange" style="font-size:.9rem;padding:.5rem 1.2rem"><span class="dot dot-orange"></span>Limited Beds</span>
+          {% else %}
+            <span class="badge badge-red" style="font-size:.9rem;padding:.5rem 1.2rem"><span class="dot dot-red"></span>Fully Occupied</span>
+          {% endif %}
+          <a href="{% url 'book_appointment' %}?hospital={{ hospital.pk }}" class="btn btn-emergency" id="book-emergency-btn">🚑 Emergency Booking</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resource Stats -->
+    {% if hospital.resource %}
+    <div class="section-header"><span class="section-label">Live Resources</span><h2>Availability Dashboard</h2></div>
+    <div class="grid grid-4" style="margin-bottom:2rem">
+      <div class="card" style="text-align:center;padding:2rem">
+        <div class="resource-num {% if hospital.resource.available_beds > 5 %}green{% elif hospital.resource.available_beds > 0 %}orange{% else %}red{% endif %}" style="font-size:3rem">{{ hospital.resource.available_beds }}</div>
+        <div style="font-size:.85rem;color:#8892b0;margin-top:.5rem">Available Beds</div>
+        <div style="font-size:.75rem;color:#4a5568">({{ hospital.resource.total_beds }} total)</div>
+        <div class="progress-bar" style="margin-top:1rem">
+          <div class="progress-fill {% if hospital.resource.bed_occupancy_pct < 60 %}green{% elif hospital.resource.bed_occupancy_pct < 85 %}orange{% else %}red{% endif %}" style="width:{{ hospital.resource.bed_occupancy_pct }}%"></div>
+        </div>
+      </div>
+      <div class="card" style="text-align:center;padding:2rem">
+        <div class="resource-num {% if hospital.resource.available_icu > 2 %}green{% elif hospital.resource.available_icu > 0 %}orange{% else %}red{% endif %}" style="font-size:3rem">{{ hospital.resource.available_icu }}</div>
+        <div style="font-size:.85rem;color:#8892b0;margin-top:.5rem">ICU Beds</div>
+        <div style="font-size:.75rem;color:#4a5568">({{ hospital.resource.total_icu }} total)</div>
+        <div class="progress-bar" style="margin-top:1rem">
+          <div class="progress-fill {% if hospital.resource.icu_occupancy_pct < 60 %}green{% elif hospital.resource.icu_occupancy_pct < 85 %}orange{% else %}red{% endif %}" style="width:{{ hospital.resource.icu_occupancy_pct }}%"></div>
+        </div>
+      </div>
+      <div class="card" style="text-align:center;padding:2rem">
+        <div class="resource-num blue" style="font-size:3rem">{{ hospital.resource.available_doctors }}</div>
+        <div style="font-size:.85rem;color:#8892b0;margin-top:.5rem">Doctors On Duty</div>
+        <div style="font-size:.75rem;color:#4a5568">({{ hospital.resource.total_doctors }} total)</div>
+      </div>
+      <div class="card" style="text-align:center;padding:2rem">
+        <div class="resource-num" style="font-size:3rem;color:#7c3aed">{{ hospital.resource.ventilators_available }}</div>
+        <div style="font-size:.85rem;color:#8892b0;margin-top:.5rem">Ventilators</div>
+        <div style="font-size:.75rem;color:#4a5568">OTs: {{ hospital.resource.operation_theaters }}</div>
+      </div>
+    </div>
+    <div style="font-size:.82rem;color:#4a5568;margin-top:-.5rem;margin-bottom:2.5rem">⏱️ Last updated: {{ hospital.resource.updated_at|timesince }} ago</div>
+    {% endif %}
+
+    <!-- ── DOCTOR DIRECTORY ──────────────────────────────────────────── -->
+    <div style="margin-bottom:2.5rem">
+      <div class="section-header" style="margin-bottom:1.5rem">
+        <span class="section-label" style="color:#7c3aed">👨‍⚕️ Doctor Directory</span>
+        <h2>Available Doctors</h2>
+        <p class="section-sub">Live OPD schedule with timings, specializations and real-time availability.</p>
+      </div>
+
+      {% if doctors %}
+      <!-- Specialization filter tabs -->
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.75rem" id="spec-tabs">
+        <button class="spec-tab" onclick="filterSpec('all',this)" id="tab-all"
+          style="padding:.4rem 1rem;border-radius:999px;border:1.5px solid var(--clr-primary);background:rgba(0,212,255,0.12);color:var(--clr-primary);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s">
+          All ({{ doctors|length }})
+        </button>
+        {% for spec_name, spec_docs in doctors_by_spec.items %}
+        <button class="spec-tab" onclick="filterSpec('{{ spec_name|slugify }}',this)" id="tab-{{ spec_name|slugify }}"
+          style="padding:.4rem 1rem;border-radius:999px;border:1.5px solid rgba(255,255,255,0.1);background:transparent;color:#8892b0;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s">
+          {{ spec_name }} ({{ spec_docs|length }})
+        </button>
+        {% endfor %}
+      </div>
+
+      <!-- Doctor cards -->
+      <div class="grid grid-auto" id="doctors-grid">
+        {% for doctor in doctors %}
+        <div class="card doctor-card"
+          data-spec="{{ doctor.get_specialization_display|slugify }}"
+          id="doctor-{{ doctor.pk }}"
+          style="padding:1.5rem;border-left:3px solid {% if doctor.status == 'available' %}var(--clr-accent-green){% elif doctor.status == 'busy' %}var(--clr-accent-orange){% else %}#4a5568{% endif %}">
+
+          <!-- Name row -->
+          <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem">
+            <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#00d4ff);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:#fff;flex-shrink:0;box-shadow:0 4px 15px rgba(124,58,237,0.3)">
+              {{ doctor.name|slice:":1"|upper }}
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:1rem;margin-bottom:.15rem">Dr. {{ doctor.name }}</div>
+              <div style="font-size:.8rem;color:var(--clr-primary);font-weight:600">{{ doctor.get_specialization_display }}</div>
+              {% if doctor.qualifications %}
+              <div style="font-size:.75rem;color:#8892b0;margin-top:.15rem">{{ doctor.qualifications }}</div>
+              {% endif %}
+            </div>
+            <div style="flex-shrink:0">
+              {% if doctor.status == 'available' %}
+                <span class="badge badge-green"><span class="dot dot-green"></span>Available</span>
+              {% elif doctor.status == 'busy' %}
+                <span class="badge badge-orange"><span class="dot dot-orange"></span>In Consult</span>
+              {% elif doctor.status == 'on_leave' %}
+                <span class="badge" style="background:rgba(255,255,255,0.06);color:#8892b0;border:1px solid rgba(255,255,255,0.1)">On Leave</span>
+              {% else %}
+                <span class="badge badge-red">Off Duty</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Info grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
+            <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:.6rem .75rem">
+              <div style="font-size:.7rem;color:#4a5568;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">🕐 Timings</div>
+              <div style="font-size:.85rem;font-weight:600">{{ doctor.timing_display }}</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:.6rem .75rem">
+              <div style="font-size:.7rem;color:#4a5568;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">📅 Days</div>
+              <div style="font-size:.82rem;font-weight:600">{{ doctor.available_days }}</div>
+            </div>
+            {% if doctor.experience_years %}
+            <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:.6rem .75rem">
+              <div style="font-size:.7rem;color:#4a5568;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">🏅 Experience</div>
+              <div style="font-size:.85rem;font-weight:600">{{ doctor.experience_years }} yrs</div>
+            </div>
+            {% endif %}
+            {% if doctor.room_number %}
+            <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:.6rem .75rem">
+              <div style="font-size:.7rem;color:#4a5568;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">🚪 Room</div>
+              <div style="font-size:.85rem;font-weight:600">{{ doctor.room_number }}</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Fee + action -->
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:.7rem;color:#4a5568;text-transform:uppercase;letter-spacing:.05em">Consultation Fee</div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:800;color:var(--clr-accent-green)">₹{{ doctor.consultation_fee }}</div>
+            </div>
+            {% if doctor.status == 'available' %}
+            <a href="{% url 'book_appointment' %}?hospital={{ hospital.pk }}" class="btn btn-primary btn-sm" id="book-doc-{{ doctor.pk }}">Book Now</a>
+            {% elif doctor.phone %}
+            <a href="tel:{{ doctor.phone }}" class="btn btn-outline btn-sm" id="call-doc-{{ doctor.pk }}">📞 Call</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="card" style="text-align:center;padding:3rem;color:#8892b0">
+        <div style="font-size:3rem;margin-bottom:.75rem">👨‍⚕️</div>
+        <h3>No doctor schedules published yet</h3>
+        <p>Please contact the hospital directly.</p>
+        <a href="tel:{{ hospital.phone }}" class="btn btn-outline" style="margin-top:1rem">📞 Call Hospital</a>
+      </div>
+      {% endif %}
+    </div>
+    <!-- ── END DOCTOR DIRECTORY ────────────────────────────────────────── -->
+
+    <!-- Available Ambulances -->
+    {% if ambulances %}
+    <div class="section-header"><span class="section-label">🚑 Dispatch</span><h2>Available Ambulances</h2></div>
+    <div class="grid grid-3" style="margin-bottom:2rem">
+      {% for amb in ambulances %}
+      <div class="card ambulance-card status-{{ amb.status }}" id="amb-{{ amb.pk }}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem">
+          <div>
+            <div style="font-weight:700">{{ amb.vehicle_number }}</div>
+            <div style="font-size:.82rem;color:#8892b0">{{ amb.get_ambulance_type_display }}</div>
+          </div>
+          <span class="badge badge-green">Available</span>
+        </div>
+        <div style="font-size:.85rem;color:#8892b0">👤 {{ amb.driver_name }}</div>
+        <div style="font-size:.85rem;margin-top:.25rem">📞 <a href="tel:{{ amb.driver_phone }}" style="color:var(--clr-accent-green)">{{ amb.driver_phone }}</a></div>
+        {% if amb.eta_minutes %}<div style="font-size:.85rem;color:var(--clr-accent-orange);margin-top:.5rem;font-weight:600">⏱️ ETA: {{ amb.eta_minutes }} min</div>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="display:flex;gap:1rem">
+      <a href="{% url 'book_appointment' %}?hospital={{ hospital.pk }}" class="btn btn-primary btn-lg" id="book-now-btn">📅 Book Appointment</a>
+      <a href="{% url 'hospitals' %}" class="btn btn-outline btn-lg">← All Hospitals</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function filterSpec(spec, btn) {
+  document.querySelectorAll('.spec-tab').forEach(function(t) {
+    t.style.background = 'transparent';
+    t.style.color = '#8892b0';
+    t.style.borderColor = 'rgba(255,255,255,0.1)';
+  });
+  btn.style.background = 'rgba(0,212,255,0.12)';
+  btn.style.color = 'var(--clr-primary)';
+  btn.style.borderColor = 'var(--clr-primary)';
+
+  document.querySelectorAll('.doctor-card').forEach(function(card) {
+    card.style.display = (spec === 'all' || card.dataset.spec === spec) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

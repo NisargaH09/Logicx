@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — Hospital Smart Connect{% endblock %}
+{% block content %}
+<section class="section-sm">
+  <div class="container">
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <div class="sidebar-user">
+          <div class="sidebar-avatar">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+          <div class="sidebar-name">{{ user.get_full_name|default:user.username }}</div>
+          <div class="sidebar-username">@{{ user.username }}</div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="{% url 'dashboard' %}" class="sidebar-link" id="sidebar-dashboard"><span class="sidebar-icon">🏠</span>Dashboard</a>
+          <a href="{% url 'my_appointments' %}" class="sidebar-link" id="sidebar-appts"><span class="sidebar-icon">📅</span>Appointments</a>
+          <a href="{% url 'medical_records' %}" class="sidebar-link" id="sidebar-records"><span class="sidebar-icon">🗂️</span>Medical Records</a>
+          <a href="{% url 'profile' %}" class="sidebar-link active" id="sidebar-profile"><span class="sidebar-icon">👤</span>My Profile</a>
+          <a href="{% url 'hospitals' %}" class="sidebar-link" id="sidebar-hospitals"><span class="sidebar-icon">🏥</span>Find Hospitals</a>
+        </nav>
+      </aside>
+
+      <main>
+        <h1 style="font-size:1.5rem;margin-bottom:1.5rem">👤 My Health Profile</h1>
+        <div class="card" style="padding:2rem">
+          <form method="post" enctype="multipart/form-data" id="profile-form">
+            {% csrf_token %}
+            <div style="display:grid;grid-template-columns:4fr 1fr;gap:2rem;align-items:start">
+              <div>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">First Name</label>{{ form.first_name }}</div>
+                  <div class="form-group"><label class="form-label">Last Name</label>{{ form.last_name }}</div>
+                </div>
+                <div class="form-group"><label class="form-label">Email</label>{{ form.email }}</div>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">Phone</label>{{ form.phone }}</div>
+                  <div class="form-group"><label class="form-label">Date of Birth</label>{{ form.date_of_birth }}</div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">Blood Group</label>{{ form.blood_group }}</div>
+                  <div></div>
+                </div>
+                <div class="form-group"><label class="form-label">Address</label>{{ form.address }}</div>
+
+                <div style="margin:1.5rem 0 .75rem;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--clr-accent-red)">🚨 Emergency Contact</div>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">Name</label>{{ form.emergency_contact_name }}</div>
+                  <div class="form-group"><label class="form-label">Phone</label>{{ form.emergency_contact_phone }}</div>
+                </div>
+
+                <div style="margin:1.5rem 0 .75rem;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--clr-secondary)">🩺 Medical Information</div>
+                <div class="form-group"><label class="form-label">Known Allergies</label>{{ form.allergies }}</div>
+                <div class="form-group"><label class="form-label">Chronic Conditions</label>{{ form.chronic_conditions }}</div>
+              </div>
+
+              <!-- Avatar placeholder -->
+              <div style="text-align:center">
+                <div style="width:80px;height:80px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#fff;margin:0 auto 1rem;box-shadow:var(--shadow-glow-primary)">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</div>
+                <div style="font-size:.78rem;color:#8892b0">Profile Picture</div>
+                <input type="file" name="avatar" accept="image/*" style="font-size:.75rem;margin-top:.5rem;color:#8892b0;width:100%">
+              </div>
+            </div>
+
+            <div style="display:flex;gap:1rem;margin-top:1.5rem">
+              <button type="submit" class="btn btn-primary btn-lg" id="save-profile-btn">Save Changes</button>
+              <a href="{% url 'dashboard' %}" class="btn btn-outline btn-lg">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+{% endblock %}
