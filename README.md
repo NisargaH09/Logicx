@@ -1,4 +1,4 @@
-#Hospital Smart Connect – Emergency Resource Visibility System
+# 🚑 Hospital Smart Connect – Emergency Resource Visibility System
 
 ## Project Description
 
@@ -10,11 +10,16 @@
 
 ## Key Features
 
+## System Modules
+### Patient Module
+### Doctor Module
+### Hospital/Admin Module
+
 ## System Architecture
 
 ## Technology Stack
 
-## Modules
+## Workflow
 
 ## Installation
 
