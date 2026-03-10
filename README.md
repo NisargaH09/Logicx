@@ -1,4 +1,4 @@
-# Healthcare Mobility and Resource Management System (Hospital Smart Connect)
+#Hospital Smart Connect – Emergency Resource Visibility System
 
 ## Project Description
 
